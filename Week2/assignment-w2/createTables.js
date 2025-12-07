@@ -1,12 +1,13 @@
 import { Client } from "pg";
 import { authors, researches, researchAuthors } from "./data.js";
+import { dbName } from "./database.js";
 
 const config = {
   host: "localhost",
   port: 5432,
   user: "hyfuser",
   password: "hyfpassword",
-  database: "prep-ex2",
+  database: dbName,
 };
 
 const client = new Client(config);
@@ -19,15 +20,13 @@ async function seedDatabase() {
       university VARCHAR(100),
       date_of_birth DATE, 
       h_index INTEGER,
-      gender VARCHAR(1) CHECK (gender IN ('m', 'f')),
-      mentor INTEGER
+      gender VARCHAR(1) CHECK (gender IN ('m', 'f'))
     );
   `;
 
   const ADD_MENTOR_COLUMN = `
   ALTER TABLE authors
   ADD COLUMN mentor INTEGER;
-
   ALTER TABLE authors
   ADD CONSTRAINT fk_mentor
   FOREIGN KEY (mentor) REFERENCES authors(author_id);
@@ -57,13 +56,11 @@ async function seedDatabase() {
     await client.connect();
     console.log("Connected to PostgreSQL database!");
 
-    await client.query(
-      "TRUNCATE TABLE research_authors RESTART IDENTITY CASCADE"
-    );
-    await client.query(
-      "TRUNCATE TABLE research_papers RESTART IDENTITY CASCADE"
-    );
-    await client.query("TRUNCATE TABLE authors RESTART IDENTITY CASCADE");
+    await client.query("DROP TABLE IF EXISTS research_authors CASCADE;");
+
+    await client.query("DROP TABLE IF EXISTS research_papers CASCADE;");
+
+    await client.query("DROP TABLE IF EXISTS authors CASCADE;");
 
     await client.query(CREATE_AUTHORS_TABLE);
     console.log("Authors table created successfully");
@@ -92,9 +89,8 @@ async function seedDatabase() {
       ];
       await client.query(insertQuery, values);
       console.log(`Inserted author: ${author.author_name}`);
-    }
 
-    for (const author of authors) {
+      //if author has mentor then update the table and add it
       if (author.mentor !== null) {
         const updateQuery = `
           UPDATE authors
@@ -128,7 +124,7 @@ async function seedDatabase() {
       `;
       const values = [ele.author_id, ele.paper_id];
       await client.query(insertQuery, values);
-      console.log(`Inserted research author successfully.`);
+      console.log(`Linked author ${ele.author_id} to paper ${ele.paper_id}.`);
     }
 
     console.log("Database seeded successfully!");

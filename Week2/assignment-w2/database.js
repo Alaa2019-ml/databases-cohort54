@@ -8,7 +8,7 @@ const client = new Client({
   port: 5432,
 });
 
-const dbName = "prep-ex2";
+export const dbName = "prep-ex2";
 
 try {
   //Connect to postgres
