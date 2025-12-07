@@ -1,11 +1,12 @@
 import { Client } from "pg";
+import { dbName } from "./database.js";
 
 const config = {
   host: "localhost",
   port: 5432,
   user: "hyfuser",
   password: "hyfpassword",
-  database: "prep-ex2",
+  database: dbName,
 };
 
 const client = new Client(config);
@@ -88,13 +89,12 @@ async function selectAll() {
   try {
     await client.connect();
     console.log("Connected to PostgreSQL database!");
-    await query1();
-    await query2();
-    await query3();
-    await query4();
-    await query5();
-    await query6();
-    await query7();
+
+    const queries = [query1, query2, query3, query4, query5, query6, query7];
+
+    for (const query of queries) {
+      await query();
+    }
   } catch (error) {
     console.error("Error executing query:", error);
   } finally {
