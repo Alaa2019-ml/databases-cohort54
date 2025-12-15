@@ -3,7 +3,7 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 const { seedDatabase } = require("./seedDatabase.js");
 
 // const MONGODB_URL = process.env.MONGODB_URL;
-// require("dotenv").config();
+require("dotenv").config();
 // const client = new MongoClient(process.env.MONGODB_URL);
 
 async function createEpisodeExercise(client) {
@@ -130,19 +130,11 @@ async function updateEpisodeExercises(client) {
   const results = await client
     .db("databaseWeek3")
     .collection("bob_ross_episodes")
-    .updateMany({ elements: "BUSHES" }, [
-      {
-        $set: {
-          elements: {
-            $map: {
-              input: "$elements",
-              as: "el",
-              in: { $cond: [{ $eq: ["$$el", "BUSHES"] }, "BUSH", "$$el"] },
-            },
-          },
-        },
-      },
-    ]);
+    .updateMany(
+      { elements: "BUSHES" },
+      { $set: { "elements.$[e]": "BUSH" } },
+      { arrayFilters: [{ e: "BUSHES" }] }
+    );
 
   console.log(
     `Ran a command to update all the BUSHES to BUSH and it updated ${results.modifiedCount} episodes`
