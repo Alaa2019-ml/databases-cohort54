@@ -1,6 +1,7 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
-const uri =
-  "mongodb+srv://hyfuser:hyfpass@cluster0.lzihhen.mongodb.net/?appName=Cluster0";
+require("dotenv").config();
+
+const uri = process.env.MONGODB_URL;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -66,7 +67,6 @@ const getPopulationPerCountry = async (mongoClient, country) => {
   ]; //end pipeline
 
   return await mongoClient.aggregate(pipeline).toArray();
-  //console.log(results);
 };
 
 const getContinentInfo = async (mongoClient, year, age) => {

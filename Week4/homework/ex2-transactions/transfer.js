@@ -1,7 +1,7 @@
 import { MongoClient } from "mongodb";
+import "dotenv/config";
 
-const uri =
-  "mongodb+srv://hyfuser:hyfpass@cluster0.lzihhen.mongodb.net/?appName=Cluster0";
+const uri = process.env.MONGODB_URL;
 
 const client = new MongoClient(uri);
 
